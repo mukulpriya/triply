@@ -7,6 +7,8 @@ import com.mukul.triply.features.vehiclemodel.VehicleModelEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -14,7 +16,8 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "vehicles")
-@Data
+@Getter
+@Setter
 public class VehicleEntity extends BaseEntity {
     @Id
     @Column(name = "id", columnDefinition = "VARCHAR(36)")

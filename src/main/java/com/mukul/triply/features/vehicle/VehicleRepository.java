@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface VehicleRepository extends BaseRepository<VehicleEntity> {
     Optional<VehicleEntity> findByRegistrationNumber(String registrationNumber);
+
+    Optional<VehicleEntity> findByRegistrationNumberAndUserId(String registrationNumber, String userId);
 }

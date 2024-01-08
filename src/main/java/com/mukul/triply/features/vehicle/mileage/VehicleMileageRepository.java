@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface VehicleMileageRepository extends BaseRepository<VehicleMileageEntity> {
 
     Optional<VehicleMileageEntity> findByVehicleIdAndYearAndMonthAndWeek(final String vehicleId, final Year year, final Month month, final Integer week);
+
+    Optional<VehicleMileageEntity> findByVehicleIdAndYearAndMonthAndWeekAndIsValid(String vehicleId, Year year, Month month, Integer week, Boolean isValid);
 }

@@ -4,9 +4,12 @@ import com.mukul.triply.exception.NotFoundException;
 import com.mukul.triply.exception.UnauthenticatedException;
 import com.mukul.triply.features.user.token.TokenEntry;
 import com.mukul.triply.features.user.token.TokenService;
+import com.mukul.triply.features.vehicle.VehicleEntity;
 import com.mukul.triply.features.vehicle.VehicleEntry;
 import com.mukul.triply.features.vehicle.VehicleService;
+import com.mukul.triply.features.vehicle.mileage.VehicleMileageEntity;
 import com.mukul.triply.features.vehicle.mileage.VehicleMileageEntry;
+import com.mukul.triply.features.vehicle.mileage.VehicleMileageMapper;
 import com.mukul.triply.features.vehicle.mileage.VehicleMileageService;
 import com.mukul.triply.features.vehiclemodel.VehicleModelEntry;
 import com.mukul.triply.features.vehiclemodel.VehicleModelService;
@@ -88,11 +91,13 @@ public class UserFacade {
             throw new BadRequestException("user not found fields");
         }
         final UserEntry userEntry = optionalUserEntry.get();
-        final VehicleModelEntry vehicleModelEntry = vehicleModelService.getBy(entry.getVehicleName(), entry.getVehicleBrand(), entry.getVehicleType(), entry.getVehicleMake());
-        final VehicleEntry vehicleEntry = vehicleService.getOrCreateBy(userEntry, vehicleModelEntry, entry.getRegistrationNumber());
-        final VehicleMileageEntry mileage = VehicleMileageEntry.getVehicleMileageEntry(entry, vehicleEntry);
 
-        vehicleService.addOrUpdateMileage(vehicleEntry.getId(), mileage);
+        final VehicleModelEntry vehicleModelEntry = vehicleModelService.getBy(entry.getVehicleName(), entry.getVehicleBrand(), entry.getVehicleType(), entry.getVehicleMake());
+        final VehicleEntity vehicleEntity = vehicleService.getOrCreateBy(userEntry, vehicleModelEntry, entry.getRegistrationNumber());
+        final VehicleMileageEntry mileage = VehicleMileageEntry.getVehicleMileageEntry(entry, vehicleEntity);
+
+
+        vehicleMileageService.upsertVehicleMileage(vehicleEntity, mileage);
     }
 
     public TokenEntry login(final String email, final String password) throws BadRequestException {

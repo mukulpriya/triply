@@ -30,12 +30,16 @@ public class VehicleService extends BaseService<VehicleEntity, VehicleEntry> {
         this.mapper = VehicleMapper.INSTANCE;
     }
 
-    private Optional<VehicleEntry> findByRegistrationNumber(final String registrationNumber) {
-        return vehicleRepository.findByRegistrationNumber(registrationNumber).map(this.mapper::toEntry);
+    private Optional<VehicleEntity> findByRegistrationNumber(final String registrationNumber) {
+        return vehicleRepository.findByRegistrationNumber(registrationNumber);
     }
 
-    public VehicleEntry getOrCreateBy(final UserEntry userEntry, final VehicleModelEntry vehicleModelEntry, final String registrationNumber) {
-        Optional<VehicleEntry> optionalVehicleEntry = findByRegistrationNumber(registrationNumber);
+    public Optional<VehicleEntry> findByRegistrationNUmberAndUserId(final String registrationNumber, final String userId) {
+        return vehicleRepository.findByRegistrationNumberAndUserId(registrationNumber, userId).map(this.mapper::toEntry);
+    }
+
+    public VehicleEntity getOrCreateBy(final UserEntry userEntry, final VehicleModelEntry vehicleModelEntry, final String registrationNumber) {
+        Optional<VehicleEntity> optionalVehicleEntry = findByRegistrationNumber(registrationNumber);
         if (optionalVehicleEntry.isPresent()) {
             return optionalVehicleEntry.get();
         }
@@ -44,7 +48,7 @@ public class VehicleService extends BaseService<VehicleEntity, VehicleEntry> {
         vehicleEntry.setIsActive(true);
         vehicleEntry.setVehicleModel(vehicleModelEntry);
         vehicleEntry.setRegistrationNumber(registrationNumber);
-        return create(vehicleEntry);
+        return vehicleRepository.save(VehicleMapper.INSTANCE.toEntity(vehicleEntry));
     }
 
     public void addOrUpdateMileage(final String vehicleId, final VehicleMileageEntry mileage) throws NotFoundException {
@@ -74,4 +78,29 @@ public class VehicleService extends BaseService<VehicleEntity, VehicleEntry> {
 
         VehicleEntity vehicleEntity1 =  this.vehicleRepository.save(vehicleEntity);
     }
+
+    public void upsertVehicleMileage(final String vehicleId, final VehicleMileageEntry mileage) throws NotFoundException {
+        final Optional<VehicleEntity> optionalVehicle = vehicleRepository.findById(vehicleId);
+        if (optionalVehicle.isEmpty()) {
+            throw new NotFoundException("vehicle not found");
+        }
+
+        final VehicleEntity vehicleEntity = optionalVehicle.get();
+
+
+        final Optional<VehicleMileageEntity> optionalVehicleMileage = vehicleMileageService.getBy(vehicleId, mileage.getYear(), mileage.getMonth(), mileage.getWeek(), Boolean.TRUE);
+
+        if (optionalVehicleMileage.isEmpty()) {
+            final VehicleMileageEntity entity = VehicleMileageMapper.INSTANCE.toEntity(mileage);
+            entity.setVehicle(vehicleEntity);
+        } else {
+            final VehicleMileageEntity vehicleMileageEntity = optionalVehicleMileage.get();
+            vehicleMileageEntity.setDistanceTravelledInKm(mileage.getDistanceTravelledInKm());
+            vehicleMileageEntity.setTotalEmission(mileage.getTotalEmission());
+            vehicleMileageEntity.setTotalRunningCost(mileage.getTotalRunningCost());
+            vehicleMileageEntity.setVehicle(vehicleEntity);
+        }
+        VehicleEntity vehicleEntity1 =  this.vehicleRepository.save(vehicleEntity);
+    }
+
 }

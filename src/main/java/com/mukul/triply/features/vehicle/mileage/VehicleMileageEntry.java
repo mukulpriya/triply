@@ -2,6 +2,7 @@ package com.mukul.triply.features.vehicle.mileage;
 
 import com.mukul.triply.common.baseclasses.BaseEntry;
 import com.mukul.triply.features.user.UserEmissionEntry;
+import com.mukul.triply.features.vehicle.VehicleEntity;
 import com.mukul.triply.features.vehicle.VehicleEntry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,15 +33,15 @@ public class VehicleMileageEntry extends BaseEntry {
 
     private Boolean isValid;
 
-    public static VehicleMileageEntry getVehicleMileageEntry(UserEmissionEntry entry, VehicleEntry vehicleEntry) {
+    public static VehicleMileageEntry getVehicleMileageEntry(UserEmissionEntry entry, VehicleEntity vehicleEntity) {
         final VehicleMileageEntry mileage = new VehicleMileageEntry();
         mileage.setYear(entry.getYear());
         mileage.setMonth(entry.getMonth());
         mileage.setWeek(entry.getWeek());
         mileage.setDistanceTravelledInKm(entry.getDistanceTravelledInKm());
-        mileage.setTotalEmission(entry.getDistanceTravelledInKm() * vehicleEntry.getVehicleModel().getEmissionPerKm());
-        mileage.setTotalRunningCost(entry.getDistanceTravelledInKm() * vehicleEntry.getVehicleModel().getRunningCostPerKm());
-        mileage.setIsValid(true);
+        mileage.setTotalEmission(entry.getDistanceTravelledInKm() * vehicleEntity.getVehicleModel().getEmissionPerKm());
+        mileage.setTotalRunningCost(entry.getDistanceTravelledInKm() * vehicleEntity.getVehicleModel().getRunningCostPerKm());
+        mileage.setIsValid(Boolean.TRUE);
         return mileage;
     }
 }
